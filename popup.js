@@ -36,6 +36,8 @@ function skeleton() {
     '<div class="skeleton" style="width:70%"></div>' +
     '<div class="skeleton" style="width:55%"></div></div>';
   $('copyJson').disabled = true;
+  const dl = $('downloadJson');
+  if (dl) dl.disabled = true;
 }
 
 function errorCard(message) {
@@ -48,6 +50,8 @@ function errorCard(message) {
     '<ol><li>Log in to the correct account in the instagram.com tab</li>' +
     '<li>Close and reopen the panel, then hit Refresh</li></ol></div>';
   $('copyJson').disabled = true;
+  const dl = $('downloadJson');
+  if (dl) dl.disabled = true;
 }
 
 function escapeHtml(s) {
@@ -98,6 +102,8 @@ function render(session) {
     '<pre class="json">' + escapeHtml(lastText) + '</pre></details></div>';
   $('main').innerHTML = html;
   $('copyJson').disabled = false;
+  const dl = $('downloadJson');
+  if (dl) dl.disabled = false;
 
   $('main').querySelectorAll('[data-copy]').forEach((btn) => {
     btn.addEventListener('click', async () => {
@@ -128,6 +134,41 @@ $('copyJson').addEventListener('click', async () => {
   await navigator.clipboard.writeText(lastText);
   toast('Copied. Paste it into test/cookies.json.', 'success');
 });
+
+const downloadBtn = $('downloadJson');
+if (downloadBtn) {
+  downloadBtn.addEventListener('click', () => {
+    if (!lastText) return;
+    const dsUserId = (lastSession && lastSession.authorizationData && lastSession.authorizationData.ds_user_id) || 'session';
+    const blob = new Blob([lastText], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cookies-' + dsUserId + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast('Downloaded cookies-' + dsUserId + '.json', 'success');
+  });
+}
+
+const resetBtn = $('resetDevice');
+if (resetBtn) {
+  resetBtn.addEventListener('click', async () => {
+    try {
+      const res = await chrome.runtime.sendMessage({ action: 'resetDevice' });
+      if (res && res.ok) {
+        toast('Device reset. Refreshing with a new device...', 'success');
+        await load();
+      } else {
+        toast('Reset failed: ' + ((res && res.error) || 'unknown error'), 'error');
+      }
+    } catch (e) {
+      toast('Reset failed: ' + (e.message || String(e)), 'error');
+    }
+  });
+}
 
 $('refresh').addEventListener('click', load);
 

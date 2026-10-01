@@ -1,0 +1,6 @@
+# igcookies — ignore local / generated files
+*.zip
+cookies.json
+**/cookies.json
+.DS_Store
+Thumbs.db
