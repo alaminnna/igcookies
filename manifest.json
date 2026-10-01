@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "igcookies — insta-fca session exporter",
+  "version": "1.0.0",
+  "description": "One click exports an insta-fca compatible cookies.json from your logged-in Instagram session. No password, no approval loop.",
+  "permissions": ["cookies", "storage", "scripting"],
+  "host_permissions": ["*://*.instagram.com/*"],
+  "icons": {
+    "16": "igcookies-icon.png",
+    "48": "igcookies-icon.png",
+    "128": "igcookies-icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.instagram.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "igcookies",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "igcookies-icon.png",
+      "48": "igcookies-icon.png",
+      "128": "igcookies-icon.png"
+    }
+  },
+  "minimum_chrome_version": "110"
+}

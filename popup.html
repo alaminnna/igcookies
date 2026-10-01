@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #faf5ec;
+    --surface: #ffffff;
+    --surface-2: #f4ecdc;
+    --border: #ead9bf;
+    --text: #3a2415;
+    --muted: #a08a6d;
+    --ink: #3a2415;
+    --brand: #d62976;
+    --brand-2: #fa7e1e;
+    --success: #2e7d4f;
+    --danger: #b3402e;
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(58,36,21,.06), 0 10px 28px rgba(58,36,21,.08);
+    --ease: 220ms cubic-bezier(.22,.61,.36,1);
+  }
+  * { box-sizing: border-box; }
+  html, body { background: transparent; }
+  body {
+    width: 372px;
+    margin: 0;
+    padding: 10px;
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .shell {
+    background: var(--bg);
+    border: none;
+    border-radius: 22px;
+    box-shadow: 0 18px 50px rgba(58,36,21,.22);
+    padding: 16px;
+    overflow: hidden;
+    min-height: 540px;
+    max-height: 580px;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (max-height: 600px) {
+    .shell { min-height: 0; max-height: none; }
+  }
+  .header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .logo {
+    display: block;
+    width: 36px; height: 36px; border-radius: 12px; flex: none;
+    object-fit: cover;
+    box-shadow: 0 3px 10px rgba(58,36,21,.25);
+  }
+  .title { font-size: 15px; font-weight: 700; margin: 0; }
+  .subtitle { font-size: 11px; color: var(--muted); margin: 0; }
+  .star-btn {
+    margin-left: auto; flex: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 650; color: var(--text); text-decoration: none;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+    padding: 7px 12px; min-height: 34px;
+    box-shadow: 0 1px 2px rgba(58,36,21,.06);
+    transition: background var(--ease), transform var(--ease);
+  }
+  .star-btn:hover { background: var(--surface-2); }
+  .star-btn:active { transform: scale(.96); }
+  .star-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .star-btn svg { width: 14px; height: 14px; }
+  #main { flex: 1; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+  .account-top { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
+  .dot.live { background: var(--success); }
+  .dot.dead { background: var(--danger); }
+  .account-label { font-size: 11px; color: var(--muted); margin: 0; }
+  .status-text { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); }
+  .status-text.live { color: var(--success); }
+  .status-text.dead { color: var(--danger); }
+  .account-id { font-size: 18px; font-weight: 700; margin: 2px 0 0; font-variant-numeric: tabular-nums; }
+  .account-name { font-size: 13px; color: var(--text); margin: 2px 0 0; }
+  .account-id-sub { font-size: 11px; color: var(--muted); margin: 4px 0 0; font-variant-numeric: tabular-nums; }
+  .account-hint { font-size: 11px; color: var(--muted); margin: 6px 0 0; }
+  .row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-top: 1px solid var(--border);
+  }
+  .row:first-of-type { border-top: none; }
+  .key { font-weight: 600; min-width: 82px; font-variant-numeric: tabular-nums; }
+  .val {
+    flex: 1; color: var(--muted); font-family: ui-monospace, Consolas, monospace;
+    font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .icon-btn {
+    flex: none; width: 34px; height: 34px; border-radius: 11px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid transparent; color: var(--muted);
+    cursor: pointer; transition: background var(--ease), color var(--ease), transform var(--ease);
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+  .icon-btn:active { transform: scale(.94); }
+  .icon-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .icon-btn svg { width: 15px; height: 15px; }
+  details.preview { margin-top: 4px; }
+  details.preview summary {
+    cursor: pointer; font-size: 12px; color: var(--muted);
+    padding: 8px 0; min-height: 34px; border-radius: 8px;
+  }
+  details.preview summary:focus-visible { outline: 2px solid var(--brand); }
+  pre.json {
+    max-height: 104px; overflow: auto; margin: 4px 0 0; padding: 10px;
+    background: #f6efe0; border: 1px solid var(--border); border-radius: 12px;
+    font-size: 11px; color: #6b5836; white-space: pre-wrap; word-break: break-all;
+  }
+  .btn {
+    width: 100%; min-height: 46px; border-radius: 14px; border: 1px solid transparent;
+    font-size: 13px; font-weight: 650; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform var(--ease), opacity var(--ease), background var(--ease), box-shadow var(--ease);
+  }
+  .btn:active { transform: scale(.985); }
+  .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn svg { width: 15px; height: 15px; }
+  .btn-primary { background: linear-gradient(135deg, var(--brand-2), var(--brand) 55%, #962fbf); color: #fff; box-shadow: 0 6px 18px rgba(214,41,118,.35); }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.07); }
+  .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border); margin-top: 8px; box-shadow: 0 1px 2px rgba(31,26,15,.05); }
+  .btn-ghost:hover { background: var(--surface-2); }
+  .footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .github-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 10px; color: var(--muted);
+    transition: background var(--ease), color var(--ease);
+  }
+  .github-btn:hover { background: var(--surface-2); color: var(--text); }
+  .github-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .github-btn svg { width: 17px; height: 17px; }
+  .brand {
+    margin: 0;
+    font-size: 10px;
+    letter-spacing: .08em;
+    color: var(--muted);
+    opacity: .75;
+    text-decoration: none;
+  }
+  .brand:hover { color: var(--text); opacity: 1; }
+  #toast {
+    position: fixed; left: 18px; right: 18px; bottom: 14px;
+    background: var(--ink); color: #faf8f2; border: 1px solid var(--ink);
+    border-radius: 14px; padding: 11px 14px; font-size: 12px;
+    box-shadow: 0 10px 28px rgba(30,27,21,.25);
+    opacity: 0; transform: translateY(8px); pointer-events: none;
+    transition: opacity var(--ease), transform var(--ease);
+  }
+  #toast.show { opacity: 1; transform: none; }
+  #toast.success { border-color: rgba(46,125,79,.6); }
+  #toast.error { border-color: rgba(179,64,46,.6); }
+  .error-card { border-color: rgba(179,64,46,.4); }
+  .error-card p { margin: 0 0 6px; font-size: 12px; }
+  .error-card ol { margin: 0; padding-left: 18px; font-size: 12px; color: var(--muted); }
+  .skeleton {
+    height: 14px; border-radius: 8px; margin: 7px 0;
+    background: linear-gradient(90deg, var(--surface-2) 25%, #f8f5ee 50%, var(--surface-2) 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite linear;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+  <div class="header">
+    <img class="logo" src="igcookies-icon.png" alt="igcookies logo" />
+    <div>
+      <h1 class="title">igcookies</h1>
+      <p class="subtitle">insta-fca session panel</p>
+    </div>
+    <a class="star-btn" href="https://github.com/alaminnna/igcookies" target="_blank" rel="noopener" aria-label="Star igcookies on GitHub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Star
+    </a>
+  </div>
+
+  <div id="main"></div>
+
+  <button class="btn btn-primary" id="copyJson" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    Copy cookies.json
+  </button>
+  <button class="btn btn-ghost" id="refresh">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg>
+    Refresh
+  </button>
+
+  <div class="footer">
+    <a class="github-btn" href="https://github.com/alaminnna" target="_blank" rel="noopener" aria-label="alaminnna on GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12v3.15c0 .3.21.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+    </a>
+    <a class="brand" href="https://github.com/alaminnna" target="_blank" rel="noopener">by alaminnna</a>
+  </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
