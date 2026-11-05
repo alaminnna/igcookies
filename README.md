@@ -56,12 +56,6 @@
 ## Download
 
 <p align="center">
-  <a href="assets/guide-download.mp4">
-    <img src="assets/guide-download-preview.png" width="720" alt="Watch the download guide" />
-  </a>
-</p>
-
-<p align="center">
   ▶ <a href="assets/guide-download.mp4">Watch the download video guide</a>
 </p>
 
