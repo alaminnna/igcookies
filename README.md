@@ -18,6 +18,7 @@
 
 <p align="center">
   <a href="#features">Features</a> ·
+  <a href="#download">Download</a> ·
   <a href="#installation">Installation</a> ·
   <a href="#security">Security</a> ·
   <a href="#license">License</a>
@@ -47,6 +48,27 @@ Designed around a straightforward principle:
 | Validation | Check exported configuration structure |
 | Privacy-focused | No third-party analytics or external data collection |
 
+## Download
+
+A short screen recording of the download steps:
+
+<p align="center">
+  <a href="assets/guide-download.mp4">
+    <img src="assets/guide-download-preview.png" width="720" alt="Watch the download guide" />
+  </a>
+</p>
+
+<p align="center">
+  ▶ <a href="assets/guide-download.mp4">Watch the video guide</a>
+</p>
+
+Prefer the files only:
+
+1. Open the **Code** menu on the repository page.
+2. Select **Download ZIP**.
+3. Extract the archive.
+4. Continue with Installation below.
+
 ## Installation
 
 **Requirements**
@@ -75,6 +97,9 @@ igcookies/
 ├── content.js
 ├── tools/
 │   └── validate.js
+├── assets/
+│   ├── guide-download.mp4
+│   └── guide-download-preview.png
 └── igcookies-icon.png
 ```
 
