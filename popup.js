@@ -133,8 +133,6 @@ function render(session) {
   const dl = $('downloadJson');
   if (dl) dl.disabled = false;
 
-  $('main').querySelector('.account-refresh')?.addEventListener('click', load);
-
   $('main').querySelectorAll('[data-copy]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const name = btn.getAttribute('data-copy');
@@ -203,5 +201,9 @@ if (resetBtn) {
 }
 
 $('refresh').addEventListener('click', load);
+
+$('main').addEventListener('click', (e) => {
+  if (e.target.closest('.account-refresh')) load();
+});
 
 document.addEventListener('DOMContentLoaded', load);
