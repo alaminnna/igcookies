@@ -21,8 +21,8 @@ function mask(value) {
 }
 
 function setStatus(state, text) {
-  const dot = document.getElementById('statusDot');
-  const label = document.getElementById('statusText');
+  const dot = $('statusDot');
+  const label = $('statusText');
   if (dot) dot.className = 'dot' + (state ? ' ' + state : '');
   if (label) {
     label.textContent = text;
@@ -32,9 +32,16 @@ function setStatus(state, text) {
 
 function skeleton() {
   $('main').innerHTML =
-    '<div class="card"><div class="skeleton" style="width:40%"></div>' +
-    '<div class="skeleton" style="width:70%"></div>' +
-    '<div class="skeleton" style="width:55%"></div></div>';
+    '<div class="card pad">' +
+    '<div class="skeleton" style="width:44%;height:14px"></div>' +
+    '<div class="skeleton" style="width:68%;margin-top:10px"></div>' +
+    '<div class="skeleton" style="width:52%;margin-top:8px"></div>' +
+    '</div>' +
+    '<div class="card pad">' +
+    '<div class="skeleton" style="width:100%"></div>' +
+    '<div class="skeleton" style="width:88%;margin-top:9px"></div>' +
+    '<div class="skeleton" style="width:94%;margin-top:9px"></div>' +
+    '</div>';
   $('copyJson').disabled = true;
   const dl = $('downloadJson');
   if (dl) dl.disabled = true;
@@ -42,13 +49,20 @@ function skeleton() {
 
 function errorCard(message) {
   $('main').innerHTML =
-    '<div class="card error-card"><div class="account-top"><span class="dot dead"></span>' +
-    '<p class="account-label">Session status</p>' +
-    '<span class="status-text dead">not logged in</span></div>' +
-    '<p><strong>No Instagram login found.</strong></p>' +
-    '<p>' + escapeHtml(message) + '</p>' +
-    '<ol><li>Log in to the correct account in the instagram.com tab</li>' +
-    '<li>Close and reopen the panel, then hit Refresh</li></ol></div>';
+    '<div class="card error-card">' +
+    '<div class="error-head">' +
+    '<span class="error-badge">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
+    '<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16.5" x2="12" y2="16.6"/></svg>' +
+    '</span>' +
+    '<p class="error-title">No Instagram login found</p>' +
+    '</div>' +
+    '<p class="error-body">' + escapeHtml(message) + '</p>' +
+    '<ol>' +
+    '<li><span>1</span><span>Log in to the correct account in the instagram.com tab</span></li>' +
+    '<li><span>2</span><span>Close and reopen the panel, then hit Refresh</span></li>' +
+    '</ol>' +
+    '</div>';
   $('copyJson').disabled = true;
   const dl = $('downloadJson');
   if (dl) dl.disabled = true;
@@ -65,7 +79,7 @@ function cookieRow(name, value) {
     '<div class="row"><span class="key">' + escapeHtml(name) + '</span>' +
     '<span class="val" title="' + escapeHtml(String(value || '')) + '">' + escapeHtml(mask(value)) + '</span>' +
     '<button class="icon-btn" data-copy="' + escapeHtml(name) + '" aria-label="Copy ' + escapeHtml(name) + '">' +
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
     '</button></div>'
   );
 }
@@ -76,30 +90,41 @@ function render(session) {
   const dsUserId = session.authorizationData.ds_user_id;
   const username = session.username || '';
   const fullName = session.fullName || '';
-  const accountTitle = username
-    ? '<p class="account-id">@' + escapeHtml(username) + '</p>' +
-      (fullName ? '<p class="account-name">' + escapeHtml(fullName) + '</p>' : '') +
-      '<p class="account-id-sub">id ' + escapeHtml(dsUserId) + '</p>'
-    : '<p class="account-id">' + escapeHtml(dsUserId) + '</p>';
+  const initial = (username || String(dsUserId) || '?').charAt(0);
+
+  const accountTitle =
+    '<p class="account-id">' + (username ? '@' + escapeHtml(username) : escapeHtml(dsUserId)) + '</p>' +
+    (fullName ? '<p class="account-name">' + escapeHtml(fullName) + '</p>' : '') +
+    '<p class="account-id-sub">id ' + escapeHtml(dsUserId) + '</p>';
+
   const cookies = session.cookieStore.cookies;
   const byName = {};
   cookies.forEach((c) => { byName[c.key] = c.value; });
 
   setStatus('live', 'logged in');
+
   const html =
-    '<div class="card"><div class="account-top"><span class="dot live"></span>' +
-    '<p class="account-label">Currently logged in</p>' +
-    '<span class="status-text live">logged in</span></div>' +
-    accountTitle +
-    '<p class="account-hint">Wrong account? Switch accounts in the Instagram tab and hit Refresh.</p></div>' +
+    '<div class="card pad">' +
+    '<div class="account-head">' +
+    '<span class="avatar">' + escapeHtml(initial) + '</span>' +
+    '<div class="account-meta">' + accountTitle + '</div>' +
+    '</div>' +
+    '<p class="account-hint">Wrong account? Switch account in the Instagram tab, then hit Refresh.</p>' +
+    '</div>' +
+
     '<div class="card">' +
-    cookieRow('sessionid', byName['sessionid']) +
+    '<div class="card-head">' +
+    '<p class="card-title">Session cookies</p>' +
+    '<span class="count">' + cookies.length + '</span>' +
+    '</div>' +
+    '<div class="rows">' +
     cookieRow('ds_user_id', byName['ds_user_id']) +
     cookieRow('csrftoken', byName['csrftoken']) +
     cookieRow('mid', byName['mid']) +
-    cookieRow('rur', byName['rur']) +
-    '<details class="preview"><summary>Full JSON preview (' + cookies.length + ' cookies)</summary>' +
+    '</div>' +
+    '<details class="preview"><summary>Full JSON preview</summary>' +
     '<pre class="json">' + escapeHtml(lastText) + '</pre></details></div>';
+
   $('main').innerHTML = html;
   $('copyJson').disabled = false;
   const dl = $('downloadJson');
@@ -121,11 +146,13 @@ async function load() {
     const res = await chrome.runtime.sendMessage({ action: 'export' });
     if (!res || !res.ok) {
       errorCard((res && res.error) || 'unknown error');
+      setStatus('dead', 'not logged in');
       return;
     }
     render(res.session);
   } catch (e) {
     errorCard(e.message || String(e));
+    setStatus('dead', 'not logged in');
   }
 }
 

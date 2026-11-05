@@ -5,222 +5,358 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root {
-    --bg: #faf5ec;
-    --surface: #ffffff;
-    --surface-2: #f4ecdc;
-    --border: #ead9bf;
-    --text: #3a2415;
-    --muted: #a08a6d;
-    --ink: #3a2415;
-    --brand: #d62976;
-    --brand-2: #fa7e1e;
-    --success: #2e7d4f;
-    --danger: #b3402e;
+    /* Apple-style translucent chrome palette */
+    --bg: #f5f5f7;
+    --surface: rgba(255, 255, 255, 0.72);
+    --surface-2: rgba(255, 255, 255, 0.55);
+    --border: rgba(0, 0, 0, 0.08);
+    --border-bright: rgba(255, 255, 255, 0.5);
+    --text: #1d1d1f;
+    --text-2: #86868b;
+    --muted: #a1a1a6;
+    --brand: #ff2d55;
+    --brand-2: #ff9f0a;
+    --brand-3: #c252de;
+    --success: #30d158;
+    --danger: #ff3b30;
     --radius: 16px;
-    --shadow: 0 1px 2px rgba(58,36,21,.06), 0 10px 28px rgba(58,36,21,.08);
-    --ease: 220ms cubic-bezier(.22,.61,.36,1);
+    --radius-sm: 10px;
+    --shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --ease: 250ms cubic-bezier(0.23, 1, 0.32, 1);
   }
+
   * { box-sizing: border-box; }
   html, body { background: transparent; }
   body {
-    width: 372px;
+    width: 380px;
     margin: 0;
-    padding: 10px;
+    padding: 14px;
     color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 13px;
-    line-height: 1.5;
+    line-height: 1.45;
     -webkit-font-smoothing: antialiased;
   }
+
+  /* ── shell — translucent chrome ─────────────────────── */
   .shell {
-    background: var(--bg);
-    border: none;
-    border-radius: 22px;
-    box-shadow: 0 18px 50px rgba(58,36,21,.22);
-    padding: 16px;
-    overflow: hidden;
-    min-height: 540px;
-    max-height: 580px;
+    position: relative;
+    background: var(--surface);
+    backdrop-filter: blur(30px) saturate(150%);
+    -webkit-backdrop-filter: blur(30px) saturate(150%);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 20px;
     display: flex;
     flex-direction: column;
+    gap: 14px;
+    overflow: visible;
   }
-  @media (max-height: 600px) {
-    .shell { min-height: 0; max-height: none; }
+
+  .shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--brand-2), var(--brand), var(--brand-3)) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0) padding-box;
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    pointer-events: none;
   }
-  .header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+
+  /* ── header ─────────────────────────────────────────── */
+  .topbar { display: flex; align-items: center; gap: 12px; }
   .logo {
-    display: block;
-    width: 36px; height: 36px; border-radius: 12px; flex: none;
-    object-fit: cover;
-    box-shadow: 0 3px 10px rgba(58,36,21,.25);
+    width: 40px; height: 40px; border-radius: 12px; flex: none; object-fit: cover;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
   }
-  .title { font-size: 15px; font-weight: 700; margin: 0; }
-  .subtitle { font-size: 11px; color: var(--muted); margin: 0; }
-  .star-btn {
+  .titles { min-width: 0; }
+  .title {
+    margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .subtitle {
+    margin: 1px 0 0; font-size: 10.5px; color: var(--text-2);
+    letter-spacing: 0.02em; font-weight: 500;
+  }
+
+  .status-chip {
     margin-left: auto; flex: none;
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 650; color: var(--text); text-decoration: none;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
-    padding: 7px 12px; min-height: 34px;
-    box-shadow: 0 1px 2px rgba(58,36,21,.06);
-    transition: background var(--ease), transform var(--ease);
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 10px 5px 9px; border-radius: 999px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    font-size: 10.5px; font-weight: 600; color: var(--text-2);
+    letter-spacing: 0.01em;
+    backdrop-filter: blur(10px);
   }
-  .star-btn:hover { background: var(--surface-2); }
-  .star-btn:active { transform: scale(.96); }
-  .star-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-  .star-btn svg { width: 14px; height: 14px; }
-  #main { flex: 1; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
+  .dot.live { background: var(--success); box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.18); }
+  .dot.dead { background: var(--danger); box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.18); }
+  .status-text { color: inherit; text-transform: lowercase; letter-spacing: 0.01em; }
+
+  /* ── cards — floating translucent surfaces ──────────── */
+  #main { display: flex; flex-direction: column; gap: 14px; }
   .card {
-    background: var(--surface);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-sm);
   }
-  .account-top { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
-  .dot.live { background: var(--success); }
-  .dot.dead { background: var(--danger); }
-  .account-label { font-size: 11px; color: var(--muted); margin: 0; }
-  .status-text { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); }
-  .status-text.live { color: var(--success); }
-  .status-text.dead { color: var(--danger); }
-  .account-id { font-size: 18px; font-weight: 700; margin: 2px 0 0; font-variant-numeric: tabular-nums; }
-  .account-name { font-size: 13px; color: var(--text); margin: 2px 0 0; }
-  .account-id-sub { font-size: 11px; color: var(--muted); margin: 4px 0 0; font-variant-numeric: tabular-nums; }
-  .account-hint { font-size: 11px; color: var(--muted); margin: 6px 0 0; }
-  .row {
+  .card.pad { padding: 14px 16px; }
+
+  .account-head { display: flex; align-items: center; gap: 16px; }
+  .avatar {
+    width: 56px; height: 56px; border-radius: 16px; flex: none;
+    display: grid; place-items: center;
+    font-size: 20px; font-weight: 800; color: #fff;
+    background: linear-gradient(135deg, var(--brand-2), var(--brand) 48%, var(--brand-3));
+    box-shadow: 0 10px 24px -8px rgba(255, 59, 48, 0.5);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+  .account-meta { min-width: 0; flex: 1; }
+  .account-id {
+    margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .account-name { margin: 3px 0 0; font-size: 12px; color: var(--text-2); font-weight: 600; }
+  .account-id-sub {
+    margin: 3px 0 0; font-size: 10.5px; color: var(--muted);
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    letter-spacing: 0.03em;
+  }
+  .account-hint {
+    margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--border);
+    font-size: 10.5px; color: var(--text-2); line-height: 1.5;
+  }
+
+  .card-head {
     display: flex; align-items: center; gap: 8px;
-    padding: 7px 0; border-top: 1px solid var(--border);
+    padding: 12px 16px 8px;
   }
-  .row:first-of-type { border-top: none; }
-  .key { font-weight: 600; min-width: 82px; font-variant-numeric: tabular-nums; }
+  .card-title {
+    margin: 0; font-size: 11px; font-weight: 700; color: var(--text-2);
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .count {
+    margin-left: auto; font-size: 10.5px; font-weight: 700; color: var(--muted);
+    background: rgba(0, 0, 0, 0.05); border-radius: 999px; padding: 3px 9px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rows { padding: 0 16px 8px; }
+  .row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 9px; border-radius: 10px;
+    transition: background 150ms ease;
+  }
+  .row:hover { background: rgba(0, 0, 0, 0.04); }
+  .key {
+    min-width: 86px; flex: none;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 11px; color: var(--text-2); letter-spacing: 0.01em;
+  }
   .val {
-    flex: 1; color: var(--muted); font-family: ui-monospace, Consolas, monospace;
-    font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    flex: 1; min-width: 0;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 12px; color: var(--text); letter-spacing: 0.03em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .icon-btn {
-    flex: none; width: 34px; height: 34px; border-radius: 11px;
-    display: inline-flex; align-items: center; justify-content: center;
+    flex: none; width: 28px; height: 28px; border-radius: 8px;
+    display: inline-grid; place-items: center;
     background: transparent; border: 1px solid transparent; color: var(--muted);
-    cursor: pointer; transition: background var(--ease), color var(--ease), transform var(--ease);
+    cursor: pointer; transition: all 120ms ease;
   }
-  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
-  .icon-btn:active { transform: scale(.94); }
-  .icon-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .row:hover .icon-btn { color: var(--text); background: rgba(0, 0, 0, 0.06); }
+  .icon-btn:hover { background: rgba(0, 0, 0, 0.08); border-color: var(--border); }
+  .icon-btn:active { transform: scale(0.9); }
   .icon-btn svg { width: 15px; height: 15px; }
-  details.preview { margin-top: 4px; }
+
+  details.preview { margin: 0; width: 100%; border: 1px solid var(--border); border-radius: 0; border-top-left-radius: 12px; border-top-right-radius: 12px; background: rgba(0, 0, 0, 0.03); }
   details.preview summary {
-    cursor: pointer; font-size: 12px; color: var(--muted);
-    padding: 8px 0; min-height: 34px; border-radius: 8px;
+    cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 11px; border-radius: 11px;
+    font-size: 10.5px; font-weight: 700; color: var(--text-2);
+    transition: color 150ms ease;
   }
-  details.preview summary:focus-visible { outline: 2px solid var(--brand); }
+  details.preview summary::-webkit-details-marker { display: none; }
+  details.preview summary::before {
+    content: ""; width: 0; height: 0; flex: none;
+    border-left: 5px solid currentColor;
+    border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+    transition: transform 180ms ease;
+  }
+  details.preview[open] summary::before { transform: rotate(90deg); }
+  details.preview summary:hover { color: var(--text); }
   pre.json {
-    max-height: 104px; overflow: auto; margin: 4px 0 0; padding: 10px;
-    background: #f6efe0; border: 1px solid var(--border); border-radius: 12px;
-    font-size: 11px; color: #6b5836; white-space: pre-wrap; word-break: break-all;
+    overflow: visible; margin: 0; padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.04); border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 10px; line-height: 1.55; color: var(--text-2);
+    white-space: pre-wrap; word-break: break-all;
   }
+
+  /* ── actions ────────────────────────────────────────── */
+  .actions { display: flex; flex-direction: column; gap: 12px; }
   .btn {
-    width: 100%; min-height: 46px; border-radius: 14px; border: 1px solid transparent;
-    font-size: 13px; font-weight: 650; cursor: pointer;
+    min-height: 52px; border-radius: 16px; border: 1px solid transparent;
+    font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    transition: transform var(--ease), opacity var(--ease), background var(--ease), box-shadow var(--ease);
+    transition: transform 120ms ease, opacity 120ms ease;
+    letter-spacing: 0.01em;
   }
-  .btn:active { transform: scale(.985); }
-  .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-  .btn:disabled { opacity: .45; cursor: default; }
-  .btn svg { width: 15px; height: 15px; }
-  .btn-primary { background: linear-gradient(135deg, var(--brand-2), var(--brand) 55%, #962fbf); color: #fff; box-shadow: 0 6px 18px rgba(214,41,118,.35); }
-  .btn-primary:hover:not(:disabled) { filter: brightness(1.07); }
-  .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border); margin-top: 8px; box-shadow: 0 1px 2px rgba(31,26,15,.05); }
-  .btn-ghost:hover { background: var(--surface-2); }
-  .footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
-  .github-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 32px; height: 32px; border-radius: 10px; color: var(--muted);
-    transition: background var(--ease), color var(--ease);
+  .btn:active { transform: scale(0.96); }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--brand-2), var(--brand) 48%, var(--brand-3));
+    color: #fff;
+    box-shadow: 0 10px 24px -8px rgba(255, 59, 48, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
-  .github-btn:hover { background: var(--surface-2); color: var(--text); }
-  .github-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-  .github-btn svg { width: 17px; height: 17px; }
-  .brand {
-    margin: 0;
-    font-size: 10px;
-    letter-spacing: .08em;
-    color: var(--muted);
-    opacity: .75;
-    text-decoration: none;
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.04); transform: translateY(-1px); box-shadow: 0 14px 28px -8px rgba(255, 59, 48, 0.5); }
+  .btn-primary:disabled { box-shadow: none; filter: grayscale(0.4) opacity(0.6); }
+  .secondary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .btn-soft {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: var(--border);
+    color: var(--text);
+    font-size: 11.5px;
+    box-shadow: var(--shadow-sm);
   }
-  .brand:hover { color: var(--text); opacity: 1; }
-  #toast {
-    position: fixed; left: 18px; right: 18px; bottom: 14px;
-    background: var(--ink); color: #faf8f2; border: 1px solid var(--ink);
-    border-radius: 14px; padding: 11px 14px; font-size: 12px;
-    box-shadow: 0 10px 28px rgba(30,27,21,.25);
-    opacity: 0; transform: translateY(8px); pointer-events: none;
-    transition: opacity var(--ease), transform var(--ease);
+  .btn-soft:hover:not(:disabled) { background: #fff; border-color: rgba(0, 0, 0, 0.12); box-shadow: var(--shadow); transform: translateY(-1px); }
+  .btn-soft svg { width: 15px; height: 15px; color: var(--text-2); }
+
+  .footer { display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 0; margin-top: 2px; }
+  .brand, .ghost-link {
+    font-size: 10px; letter-spacing: 0.05em; color: var(--text-2);
+    text-decoration: none; transition: color 180ms ease; font-weight: 600;
   }
-  #toast.show { opacity: 1; transform: none; }
-  #toast.success { border-color: rgba(46,125,79,.6); }
-  #toast.error { border-color: rgba(179,64,46,.6); }
-  .error-card { border-color: rgba(179,64,46,.4); }
-  .error-card p { margin: 0 0 6px; font-size: 12px; }
-  .error-card ol { margin: 0; padding-left: 18px; font-size: 12px; color: var(--muted); }
+  .brand:hover, .ghost-link:hover { color: var(--text); }
+  .ghost-link { display: inline-flex; align-items: center; gap: 5px; }
+
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px;
+  }
+
+  /* ── states ─────────────────────────────────────────── */
   .skeleton {
-    height: 14px; border-radius: 8px; margin: 7px 0;
-    background: linear-gradient(90deg, var(--surface-2) 25%, #f8f5ee 50%, var(--surface-2) 75%);
+    height: 12px; border-radius: 7px;
+    background: linear-gradient(90deg, #e5e5ea 25%, #f2f2f7 50%, #e5e5ea 75%);
     background-size: 200% 100%; animation: shimmer 1.4s infinite linear;
   }
   @keyframes shimmer { to { background-position: -200% 0; } }
+
+  .error-card { padding: 16px; border-color: rgba(255, 69, 58, 0.16); background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); }
+  .error-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .error-badge {
+    width: 32px; height: 32px; border-radius: 10px; flex: none;
+    display: grid; place-items: center; color: var(--danger);
+    background: rgba(255, 69, 58, 0.1);
+  }
+  .error-badge svg { width: 17px; height: 17px; }
+  .error-title { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
+  .error-body { margin: 0 0 10px; font-size: 11.5px; color: var(--text-2); line-height: 1.5; }
+  .error-card ol {
+    margin: 0; padding: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 6px;
+    font-size: 10.5px; color: var(--text-2);
+  }
+  .error-card li { display: flex; gap: 8px; align-items: flex-start; }
+  .error-card li span:first-child {
+    flex: none; width: 17px; height: 17px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 9px; font-weight: 800;
+    background: rgba(0, 0, 0, 0.06); color: var(--muted);
+  }
+
+  #toast {
+    position: fixed; left: 16px; right: 16px; bottom: 14px;
+    padding: 11px 15px; border-radius: 14px;
+    background: rgba(28, 28, 30, 0.92); color: #f5f5f7;
+    backdrop-filter: blur(20px);
+    font-size: 11.5px; text-align: center;
+    box-shadow: var(--shadow);
+    opacity: 0; transform: translateY(10px); pointer-events: none;
+    transition: opacity 220ms ease, transform 220ms ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  #toast.show { opacity: 1; transform: none; }
+  #toast.success { box-shadow: 0 14px 34px -10px rgba(52, 199, 89, 0.5); }
+  #toast.error { background: rgba(255, 69, 58, 0.96); box-shadow: 0 14px 34px -10px rgba(255, 69, 58, 0.5); }
+
+  /* ── reduced motion ─────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
+    .row:hover { background: transparent; }
+    .btn:hover { transform: none; }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .shell, .card, .error-card, .btn-soft, details.preview, pre.json {
+      background: white !important; backdrop-filter: none !important;
+    }
   }
 </style>
 </head>
 <body>
   <div class="shell">
-  <div class="header">
-    <img class="logo" src="igcookies-icon.png" alt="igcookies logo" />
-    <div>
-      <h1 class="title">igcookies</h1>
-      <p class="subtitle">insta-fca session panel</p>
+
+    <header class="topbar">
+      <img class="logo" src="igcookies-icon.png" alt="" />
+      <div class="titles">
+        <h1 class="title">igcookies</h1>
+        <p class="subtitle">Instagram session manager</p>
+      </div>
+      <span class="status-chip">
+        <span class="dot" id="statusDot"></span>
+        <span class="status-text" id="statusText">checking</span>
+      </span>
+    </header>
+
+    <main id="main"></main>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="copyJson" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy cookies.json
+      </button>
+
+      <div class="secondary">
+        <button class="btn btn-soft" id="downloadJson" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Save
+        </button>
+        <button class="btn btn-soft" id="refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+          Refresh
+        </button>
+        <button class="btn btn-soft" id="resetDevice" title="Generate a fresh device identity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+          Device
+        </button>
+      </div>
     </div>
-    <a class="star-btn" href="https://github.com/alaminnna/igcookies" target="_blank" rel="noopener" aria-label="Star igcookies on GitHub">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Star
-    </a>
-  </div>
 
-  <div id="main"></div>
-
-  <button class="btn btn-primary" id="copyJson" disabled>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-    Copy cookies.json
-  </button>
-  <button class="btn btn-ghost" id="downloadJson" disabled>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="12" x2="12" y2="15"/></svg>
-    Download
-  </button>
-  <button class="btn btn-ghost" id="refresh">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg>
-    Refresh
-  </button>
-  <button class="btn btn-ghost" id="resetDevice" title="Generate a fresh device identity">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
-    Reset device
-  </button>
-
-  <div class="footer">
-    <a class="github-btn" href="https://github.com/alaminnna" target="_blank" rel="noopener" aria-label="alaminnna on GitHub">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12v3.15c0 .3.21.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
-    </a>
-    <a class="brand" href="https://github.com/alaminnna" target="_blank" rel="noopener">by alaminnna</a>
-  </div>
+    <footer class="footer">
+      <a class="brand" href="https://github.com/alaminnna" target="_blank" rel="noopener">by alaminnna</a>
+      <a class="ghost-link" href="https://github.com/alaminnna/igcookies" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12v3.15c0 .3.21.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+        Star on GitHub
+      </a>
+    </footer>
   </div>
 
   <div id="toast" role="status" aria-live="polite"></div>
   <script src="popup.js"></script>
 </body>
 </html>
-
