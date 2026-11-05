@@ -1,261 +1,152 @@
-# igcookies — Instagram Session to cookies.json Exporter for insta-fca
+# igcookies
 
-Export your logged-in Instagram browser session to an `insta-fca` compatible `cookies.json` in one click. No password login, no new-device approval loop, no 2FA codes.
+<p align="center">
+  <img src="igcookies-icon.png" width="76" alt="igcookies logo" />
+</p>
 
-I kept hitting Instagram's new-device approval every time I logged my bot in with a password. So I built this small Chrome extension for my own workflow: it reads the already-approved session from `instagram.com` and builds a clean, minimal `cookies.json` that my Instagram bot ([insta-fca / ica-unofficial](https://www.npmjs.com/package/@alaminnna/ica-unofficial)) can use directly.
+<h3 align="center">Instagram Session Manager</h3>
 
-Click the icon, check which account is logged in, hit Copy, paste into `test/cookies.json`, run the bot. That is the whole flow.
+<p align="center">
+  A local-first Chrome extension for managing your own Instagram browser session in development environments.
+</p>
 
-> Built and maintained by [Al A Min (Alaminnna)](https://github.com/alaminnna) — AI Developer, Full Stack Web Developer, Open Source Builder in Dhaka, Bangladesh.
+<p align="center">
+  <img src="https://img.shields.io/badge/Manifest-V3-333333?style=flat-square" />
+  <img src="https://img.shields.io/badge/Platform-Chrome-333333?style=flat-square" />
+  <img src="https://img.shields.io/badge/License-MIT-333333?style=flat-square" />
+</p>
 
-**Keywords:** instagram session exporter, instagram cookies.json exporter, insta-fca, ica-unofficial, instagram bot login, instagram sessionid exporter, instagram dm bot nodejs, alaminnna
-
----
-
-## Table of Contents
-
-- [Why igcookies](#why-igcookies)
-- [How it works](#how-it-works)
-- [Install](#install)
-- [Daily use](#daily-use)
-- [What the panel shows](#what-the-panel-shows)
-- [Exported cookies](#exported-cookies)
-- [Stable device](#stable-device)
-- [Validate your cookies.json](#validate-your-cookiesjson)
-- [Example structure](#example-cookiesjson-structure)
-- [Security](#security)
-- [Privacy](#privacy)
-- [Project structure](#project-structure)
-- [Troubleshooting](#troubleshooting)
-- [FAQ](#faq)
-- [Related projects](#related-projects)
-- [About the author](#about-the-author)
-- [Support](#support)
-- [License](#license)
+<p align="center">
+  <a href="#features">Features</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#security">Security</a> ·
+  <a href="#license">License</a>
+</p>
 
 ---
 
-## Why igcookies
+## About
 
-Password logins look like a "new device" to Instagram. That triggers approval screens, email codes, and sometimes lockouts — painful when you just want your Node.js Instagram DM bot to stay logged in.
+**igcookies** is a lightweight browser extension built for developers working with Instagram integrations.
 
-igcookies skips that entirely. You log in once, normally, in Chrome. The extension reuses that approved `sessionid + ds_user_id` pair. Instagram already trusts this browser, so there is no approval loop.
+It provides a simple interface to identify the currently authenticated account and inspect locally available session information.
 
-Honestly, this took longer than I thought — mostly getting the account display right so I never paste the wrong account's session again.
+Designed around a straightforward principle:
 
-## How it works
+> Your development environment should remain transparent, predictable, and under your control.
 
-1. You log in normally at `instagram.com` in Chrome or Edge, using the account your bot should run as.
-2. igcookies reads the Instagram cookies for that domain through the `chrome.cookies` API — only the ones the bot login actually needs.
-3. It attaches a stable device identity (generated once, stored in `chrome.storage.local`) with a Pixel 8 Pro / Android 14 user agent.
-4. It builds a minimal session object with `authorizationData`, `cookieStore` (tough-cookie format), `uuids`, `deviceSettings`, and `userAgent`.
-5. The popup panel shows the live account first (`@username` + `ds_user_id`), then lets you copy the full JSON.
+## Features
 
-Nothing leaves your machine. There is no server, no analytics, and no API call to Instagram. The content script only reads your visible username from the left navigation so the panel can display the correct account. That DOM-only approach means Instagram has nothing to rate-limit — no 429 risk.
+| Feature | Description |
+|:--|:--|
+| Account overview | Identify the currently recognized account |
+| Session inspection | View relevant session information |
+| JSON export | Organize session data into a structured format |
+| Local configuration | Maintain extension-generated settings locally |
+| Device settings | Manage locally stored device configuration |
+| Validation | Check exported configuration structure |
+| Privacy-focused | No third-party analytics or external data collection |
 
-## Install
+## Installation
 
-Takes about 30 seconds:
+**Requirements**
 
-1. Open `chrome://extensions` and turn on **Developer mode** (top right).
-2. Click **Load unpacked** and select the `igcookies` folder from this repo.
-3. Go to [instagram.com](https://www.instagram.com) and log in to the account you want the bot to use.
-4. Click the igcookies toolbar icon. Check the account ID in the panel. Hit Copy.
+- Google Chrome 110+
+- Instagram account
+- Local copy of this repository
 
-Works on Chrome and Edge (Manifest V3, minimum Chrome 110). A cross-browser shim normalizes `browser` to `chrome`, so the same code also runs in Firefox with minor manifest adjustments.
+**Setup**
 
-## Daily use
+1. Clone this repository.
+2. Open `chrome://extensions`.
+3. Enable Developer mode.
+4. Select **Load unpacked**.
+5. Choose the project directory.
+6. Open Instagram and use the extension.
 
-```text
-1. Log in at instagram.com in Chrome (the account you want to run)
-2. Click the igcookies toolbar icon — the panel shows the live session
-3. Wrong account? Switch accounts in the Instagram tab, then hit Refresh
-4. Click "Copy cookies.json" and paste it into insta-fca/test/cookies.json
-5. From the insta-fca folder, run: node test/bot.js
-```
-
-Sessions expire eventually. When that happens, just export again from the browser. The device identity stays the same, so Instagram keeps seeing a familiar device.
-
-## What the panel shows
-
-I designed the panel to show the account *before* you copy, so a wrong-account paste never slips through:
-
-- **Account card:** currently logged-in user — `@username`, full name when available, and `id <ds_user_id>`. On first load before the username is cached, it falls back to just the ID.
-- **Masked cookie rows:** `sessionid`, `ds_user_id`, `csrftoken`, `mid`, `rur` — each with its own per-row copy button. Values are masked so screenshots do not leak the session.
-- **Full JSON preview:** collapsible block showing the complete session with cookie count.
-- **Buttons:** Copy cookies.json (primary), Refresh, Download (optional), Reset device.
-- **States:** loading skeleton while checking, green "logged in" dot on success, red "not logged in" error card with recovery steps.
-
-## Exported cookies
-
-Only what `insta-fca` session login needs — nothing else:
-
-```js
-KEEP_COOKIES = ['sessionid', 'ds_user_id', 'ds_user', 'csrftoken', 'mid', 'rur']
-```
-
-- `sessionid` — the core session token. This authenticates the bot.
-- `ds_user_id` — numeric Instagram user ID. Shown in the panel for verification.
-- `csrftoken` — CSRF token for write requests.
-- `mid` — machine identifier cookie.
-- `rur` — routing cookie.
-- `ds_user` — display-only username. The bot login does not use it; the panel does.
-
-Left out on purpose: tracking cookies (`datr`, `ig_did`, `wd`) and extra fields (`_igcookies`, `fbns_auth`, `usdid`). The API login never reads them.
-
-Each cookie is converted to tough-cookie format (`MemoryCookieStore`, `tough-cookie@6.0.2`) with domain, path, secure, httpOnly, sameSite, and timestamps — exactly what `insta-fca` expects.
-
-## Stable device
-
-First run generates a device identity stored in `chrome.storage.local` under `igcookies_device_v1`:
-
-- `phone_id`, `uuid`, `client_session_id`, `advertising_id`, `android_device_id`, `request_id`, `tray_session_id`
-- Defaults: Pixel 8 Pro (`husky`), Android 14 (API 34), `480dpi`, `1344x2992`, Instagram app `448.0.0.0.20`
-- Locale `en_US`, country `US`, timezone `GMT-04:00`
-
-Every export reuses the same device, so Instagram sees a familiar client. Want a fresh one? The background worker handles a `resetDevice` message that clears it.
-
-## Validate your cookies.json
-
-From the `igcookies` folder:
-
-```bash
-node tools/validate.js "../insta-fca/test/cookies.json"
-```
-
-Expected:
-
-```text
-OK! user=123456789 cookies=5 file=../insta-fca/test/cookies.json
-```
-
-Checks `uuids.uuid`, `authorizationData.sessionid`, `authorizationData.ds_user_id`, `cookieStore`, and device settings. Warns if cookies are missing from the store since `authorizationData` is the fallback.
-
-`NOT_LOGGED_IN`? Log in at `instagram.com` first, reopen the panel, hit Refresh.
-
-## Example cookies.json structure
-
-```jsonc
-{
-  "uuids": {
-    "phone_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-    "uuid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-    "android_device_id": "android-xxxxxxxxxxxxxxxx"
-  },
-  "username": "your_username",
-  "authorizationData": {
-    "ds_user_id": "123456789",
-    "sessionid": "YOUR_SESSION_ID"
-  },
-  "cookieStore": {
-    "version": "tough-cookie@6.0.2",
-    "storeType": "MemoryCookieStore",
-    "cookies": [{ "key": "sessionid", "value": "..." }]
-  },
-  "deviceSettings": { "model": "Pixel 8 Pro" },
-  "userAgent": "Instagram 448.0.0.0.20 Android (...)",
-  "locale": "en_US",
-  "csrftoken": "..."
-}
-```
-
-## Security
-
-`cookies.json` works like a password. Anyone holding it can act as your Instagram account.
-
-- Never commit it to git. Add `test/cookies.json` to `.gitignore`.
-- Never share it in screenshots, GitHub issues, or Discord.
-- The panel masks values by default — keep it that way on screen-shares.
-- Pasted it somewhere by mistake? Log out of Instagram everywhere to kill the `sessionid`, then export fresh.
-
-## Privacy
-
-- Reads only `*.instagram.com` cookies matching the 6 names above.
-- Stores only the generated device + last-seen username in `chrome.storage.local`.
-- Zero network requests to any third party. No fetch, no beacon, no analytics.
-- Needs `cookies`, `storage`, `scripting` + `*://*.instagram.com/*` — the minimum to read the session and visible username.
-
-## Project structure
+## Project Structure
 
 ```text
 igcookies/
-├── manifest.json      — MV3, minimum Chrome 110
-├── background.js      — cookie read, device, session build, export/resetDevice
-├── popup.html         — panel UI (account card, masked rows, preview)
-├── popup.js           — panel logic: auto-load, render, copy, refresh
-├── content.js         — reads @username from page nav, caches locally (no 429)
-├── tools/validate.js  — checks uuids, authorizationData, cookieStore, device
-└── igcookies-icon.png — toolbar icon (16 / 48 / 128)
+├── manifest.json
+├── background.js
+├── popup.html
+├── popup.js
+├── content.js
+├── tools/
+│   └── validate.js
+└── igcookies-icon.png
 ```
 
-Username resolution order: `ds_user` cookie, then live tab scrape via `chrome.scripting.executeScript`, then cached `igcookies_username`. The scraper matches left-nav profile links and skips explore, reels, direct, and similar segments.
+## Architecture
 
-## Troubleshooting
+The extension uses Chrome's Manifest V3 architecture.
 
-**"No Instagram login found"** — log in at `instagram.com`, close/reopen the panel, hit Refresh.
+| Component | Responsibility |
+|:--|:--|
+| `background.js` | Extension background operations |
+| `popup.html` | User interface |
+| `popup.js` | Interface interactions |
+| `content.js` | Account identification |
+| `manifest.json` | Permissions and configuration |
+| `validate.js` | Configuration validation |
 
-**Wrong account copied** — switch accounts in the Instagram tab, Refresh the panel, confirm the ID changed, then Copy.
+## Security
 
-**Bot still asks for login** — check the path: `insta-fca/test/cookies.json`, not `igcookies/cookies.json`. Run the validator on that exact path.
+Authentication cookies are sensitive credentials.
 
-**Only numeric ID, no @username** — normal on first load. Open any instagram.com page once so the content script caches it, then Refresh.
+- Never publish session data.
+- Never commit personal authentication files.
+- Keep exported files outside public repositories.
+- Use only accounts you own or are authorized to manage.
+- Revoke compromised sessions through Instagram's official security settings.
 
-**Session expired** — Instagram rotates sessions. Export fresh; the device stays the same so it is quick.
+This project does not bypass authentication, two-factor authentication, or platform security verification.
 
-## FAQ
+## Privacy
 
-**Do I need my password?** No. It reads the session your browser already has.
+The extension is designed for local operation.
 
-**Does it bypass 2FA?** No. It reuses a session you already approved. Re-verify in the browser first if asked, then export.
+- No third-party analytics.
+- No external telemetry.
+- No intentional transmission of session data to external servers.
+- Locally stored extension configuration.
 
-**Ban risk?** Unofficial workflow — the extension only reads cookies locally, but any Instagram automation carries risk. Test account first, low rates, follow the [Instagram Terms](https://help.instagram.com/581066165581870).
+Review the source code and requested browser permissions before installation.
 
-**Web Store link?** Not published yet. Load unpacked — 30 seconds, and you can read every line here.
+## Related Projects
 
-**Works with instagrapi?** Output is built for `insta-fca` (sessionid + tough-cookie). Other libs need format tweaks.
+**ica-unofficial**
 
-## Related projects
+An independent Node.js package for experimenting with Instagram integrations.
 
-- [@alaminnna/ica-unofficial](https://www.npmjs.com/package/@alaminnna/ica-unofficial) — unofficial Instagram Chat API for Node.js (DM bots + MQTT realtime). The bot igcookies was built to log in.
-- [ica-unofficial on GitHub](https://github.com/alaminnna/ica-unofficial) — source and issues.
+- [GitHub Repository](https://github.com/alaminnna/ica-unofficial)
+- [npm Package](https://www.npmjs.com/package/@alaminnna/ica-unofficial)
 
-Searching "instagram bot nodejs login without password", "instagram sessionid to cookies.json", "insta-fca session exporter"? This is that tool.
+## Disclaimer
 
-## About the author
+igcookies is an independent, unofficial project.
 
-**Al A Min (Alaminnna)** — AI Developer, Full Stack Web Developer, Student, Entrepreneur, Open Source Builder from Dhaka, Bangladesh. I build small tools that remove annoying steps.
+It is not affiliated with, endorsed by, or associated with Meta Platforms, Inc. or Instagram.
 
-- Website: [alaminnna.ami.bd](https://alaminnna.ami.bd)
-- GitHub: [github.com/alaminnna](https://github.com/alaminnna)
-- LinkedIn: [linkedin.com/in/alaminnna](https://www.linkedin.com/in/alaminnna/)
-- npm: [npmjs.com/~alaminnna](https://www.npmjs.com/~alaminnna)
-- Medium: [medium.com/@Alaminnna](https://medium.com/@Alaminnna)
-- DEV: [dev.to/alaminnna](https://dev.to/alaminnna)
-- Hashnode: [hashnode.com/@alaminnna](https://hashnode.com/@alaminnna)
-- YouTube: [youtube.com/@alaminnna](https://www.youtube.com/@alaminnna)
-- Instagram: [instagram.com/alaminnna](https://www.instagram.com/alaminnna)
-- Threads: [threads.net/@alaminnna](https://www.threads.net/@alaminnna)
-- TikTok: [tiktok.com/@alaminnnna](https://www.tiktok.com/@alaminnnna)
-- Pinterest: [pinterest.com/alaminnnnna](https://www.pinterest.com/alaminnnnna/)
-- Stack Overflow: [stackoverflow.com/users/33006113/alaminnna](https://stackoverflow.com/users/33006113/alaminnna)
-- Product Hunt: [producthunt.com/@alaminnna](https://www.producthunt.com/@alaminnna)
-- Linktree: [linktr.ee/alaminnna](https://linktr.ee/alaminnna)
-- Facebook Page: [facebook.com/profile.php?id=61592578435860](https://www.facebook.com/profile.php?id=61592578435860)
+Users are responsible for complying with applicable platform terms and policies.
 
-## Support
+## Author
 
-Star it if it saves you a headache: [github.com/alaminnna/igcookies](https://github.com/alaminnna/igcookies)
+**Al A Min**
 
-Bugs: [github.com/alaminnna/igcookies/issues](https://github.com/alaminnna/igcookies/issues)
+Independent Developer · Open Source Builder
+
+[GitHub](https://github.com/alaminnna) · [Website](https://alaminnna.ami.bd) · [LinkedIn](https://linkedin.com/in/alaminnna/)
 
 ## License
 
-MIT — do what you want, keep the credit. See the repo LICENSE.
+MIT License.
+
+See [LICENSE](LICENSE) for details.
 
 ---
 
-*Small win. Still working on it — the next version is already in progress.*
-
-
-
-
+<p align="center">
+  <sub>Designed and maintained by <a href="https://github.com/alaminnna">Alaminnna</a>.</sub>
+</p>
