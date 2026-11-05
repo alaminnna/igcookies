@@ -2,6 +2,10 @@
   <img src="igcookies-icon.png" width="110" alt="igcookies logo" />
 </p>
 
+<p align="center">
+  <img src="assets/cover.png" alt="igcookies cover" />
+</p>
+
 <h1 align="center">igcookies</h1>
 
 <p align="center">
