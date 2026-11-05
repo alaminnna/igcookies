@@ -1,22 +1,5 @@
 'use strict';
 
-/* cross-browser shim: Firefox exposes `browser`, Chrome/Edge expose `chrome`.
- * Normalizes to `chrome` so the same code runs in all three. */
-
-(function normalizeExtApi() {
-  try {
-    var hasBrowser = (typeof browser !== 'undefined' && browser && browser.storage);
-    var hasChrome = (typeof chrome !== 'undefined' && chrome && chrome.storage);
-    if (hasBrowser && !hasChrome) {
-      globalThis.chrome = browser;
-    } else if (hasBrowser && hasChrome) {
-      try {
-        if (!chrome.scripting && browser.scripting) chrome.scripting = browser.scripting;
-      } catch (_) {}
-    }
-  } catch (_) {}
-})();
-
 /* igcookies — background service worker
  * Reuses the approved browser session to build an insta-fca compatible MINIMAL cookies.json.
  * - Only the 5 cookies that matter: sessionid, ds_user_id, csrftoken, mid, rur
@@ -193,7 +176,7 @@ async function buildSession() {
     fullName: '',
     authorizationData: { ds_user_id: String(dsUserId), sessionid: String(sessionid) },
     cookieStore: {
-      version: 'tough-cookie@6.0.2',
+      name: 'tough-cookie@6.0.2',
       storeType: 'MemoryCookieStore',
       rejectPublicSuffixes: true,
       enableLooseMode: false,
